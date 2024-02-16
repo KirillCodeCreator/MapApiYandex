@@ -2,7 +2,7 @@ import os
 
 from PyQt5 import uic
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMainWindow, QLabel
+from PyQt5.QtWidgets import QMainWindow, QLabel, QComboBox
 
 from constants import MAP_LAYERS, MAP_IMG_SIZE_V
 from converter import lonlat_to_xy, xy_to_lonlat
@@ -15,6 +15,7 @@ class Window(QMainWindow):
     lonlat: Vec
     map_type: str
     map_label: QLabel
+    layer_input: QComboBox
 
     def __init__(self):
         super().__init__()
@@ -23,8 +24,13 @@ class Window(QMainWindow):
 
     def init(self):
         self.zoom = 9
+        self.layer_input.currentIndexChanged.connect(self.layer_changed)
         self.lonlat = Vec(37.530887, 55.703118)
-        self.map_type = MAP_LAYERS[0]
+        self.map_type = MAP_LAYERS[self.layer_input.currentIndex()]
+        self.update_map()
+
+    def layer_changed(self, index):
+        self.map_type = MAP_LAYERS[index]
         self.update_map()
 
     def update_map(self):
@@ -72,3 +78,7 @@ class Window(QMainWindow):
                 abs(abs(self.lonlat.y) - 85) < 0.5 or
                 not (0 <= self.zoom <= 21)
         )
+
+    def layer_changed(self, index):
+        self.map_type = MAP_LAYERS[index]
+        self.update_map()
