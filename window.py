@@ -5,7 +5,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QLabel
 
 from constants import MAP_LAYERS, MAP_IMG_SIZE_V
-from converter import lonlat_to_xy, xy_to_lonlat, lonlat_to_spn
+from converter import lonlat_to_xy, xy_to_lonlat
 from static_maps import show_map, MAP_TMP_FILENAME
 from vec import Vec
 
@@ -72,18 +72,3 @@ class Window(QMainWindow):
                 abs(abs(self.lonlat.y) - 85) < 0.5 or
                 not (0 <= self.zoom <= 21)
         )
-
-    def layer_changed(self, index):
-        self.map_type = MAP_LAYERS[index]
-        self.update_map()
-
-    def compare_spn(self, obj_size, cmp):
-        ym_spn = lonlat_to_spn(self.zoom, *self.lonlat.xy)
-
-        return (cmp == -1 and (
-                ym_spn.x < obj_size.x or
-                ym_spn.y < obj_size.y
-        )) or (cmp == 1 and (
-                ym_spn.x > obj_size.x or
-                ym_spn.y > obj_size.y
-        ))
