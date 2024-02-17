@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QMainWindow, QLabel, QComboBox, QLineEdit, QMessageB
 from constants import MAP_LAYERS, MAP_IMG_SIZE_V
 from converter import lonlat_to_xy, xy_to_lonlat, lonlat_to_spn
 from geocoder import get_toponym, get_toponym_lonlat, get_toponym_spn
-from static_maps import show_map, MAP_TMP_FILENAME, show_map_with_dot
+from static_maps import show_map, MAP_TMP_FILENAME
 from vec import Vec
 
 
@@ -19,6 +19,7 @@ class Window(QMainWindow):
     layer_input: QComboBox
     address_input: QLineEdit
     options_layout: QVBoxLayout
+    dot = None
 
     def __init__(self):
         super().__init__()
@@ -32,6 +33,7 @@ class Window(QMainWindow):
 
         self.find_button.clicked.connect(self.find_obj)
 
+        self.dot = None
         self.zoom = 9
         self.lonlat = Vec(37.530887, 55.703118)
         self.update_map()
@@ -41,7 +43,7 @@ class Window(QMainWindow):
         self.update_map()
 
     def update_map(self):
-        show_map(self.map_label, self.zoom, self.lonlat, self.map_type)
+        show_map(self.map_label, self.zoom, self.lonlat, self.map_type, self.dot)
 
     def closeEvent(self, event):
         os.remove(MAP_TMP_FILENAME)
@@ -97,6 +99,7 @@ class Window(QMainWindow):
                 or (cmp == 1 and (map_spn.x > obj_size.x or map_spn.y > obj_size.y)))
 
     def delete_search_results(self):
+        self.dot = None
         self.update_map()
 
     def search_toponym(self, search_text):
@@ -115,11 +118,11 @@ class Window(QMainWindow):
 
         coords = get_toponym_lonlat(toponym)
         obj_size = get_toponym_spn(toponym)
-        self.lonlat = dot = coords
+        self.lonlat = self.dot = coords
 
         while self.compare_spn(obj_size, 1):
             self.zoom += 1
         while self.compare_spn(obj_size, -1):
             self.zoom -= 1
 
-        show_map_with_dot(self.map_label, self.zoom, self.lonlat, self.map_type, dot)
+        self.update_map()
