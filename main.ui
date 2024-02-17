@@ -71,12 +71,15 @@
       </property>
       <item>
        <widget class="QLabel" name="map_label">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
         </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
         <property name="text">
          <string>Слой карты</string>
         </property>
