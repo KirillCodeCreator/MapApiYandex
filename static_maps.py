@@ -27,3 +27,28 @@ def show_map(map_label, z, lola, map_type):
         o_file.write(response.content)
 
     map_label.setPixmap(QPixmap(MAP_TMP_FILENAME))
+
+
+def show_map_with_dot(map_label, z, lola, map_type, dot):
+    params = {
+        'z': z,
+        'll': lola.to_ym(),
+        'l': map_type,
+        'size': MAP_IMG_SIZE
+    }
+
+    if dot:
+        params['pt'] = f'{dot.x},{dot.y},pm2gnm'
+
+    response = requests.get(MAP_API_SERVER, params=params)
+
+    if not response:
+        print('Произошла ошибка при получении карты.')
+        print(f'{response.status_code}: {response.reason}')
+        print(response.text)
+        sys.exit(1)
+
+    with open(MAP_TMP_FILENAME, 'wb') as o_file:
+        o_file.write(response.content)
+
+    map_label.setPixmap(QPixmap(MAP_TMP_FILENAME))
