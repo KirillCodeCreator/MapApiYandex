@@ -22,7 +22,6 @@ def get_toponym(address):
         sys.exit()
 
     json_response = response.json()
-
     return json_response["response"]["GeoObjectCollection"][
         "featureMember"][0]["GeoObject"]
 
@@ -30,7 +29,6 @@ def get_toponym(address):
 def get_toponym_lonlat(toponym):
     toponym_pos = toponym["Point"]["pos"]
     lo, la = map(float, toponym_pos.split(" "))
-
     return Vec(lo, la)
 
 
@@ -38,11 +36,17 @@ def get_toponym_spn(toponym):
     corners = toponym["boundedBy"]["Envelope"]
     lc = [*map(float, corners["lowerCorner"].split())]
     uc = [*map(float, corners["upperCorner"].split())]
-
     return Vec(uc[0] - lc[0], uc[1] - lc[1])
 
 def get_address(toponym):
     address = toponym['metaDataProperty']['GeocoderMetaData'][
         'Address']['formatted']
-
     return address
+
+def get_post_index(toponym):
+    try:
+        post_index = toponym['metaDataProperty']['GeocoderMetaData'][
+            'Address']['postal_code']
+    except KeyError:
+        return '\nнет индекса'
+    return post_index
