@@ -2,7 +2,7 @@ import os
 
 from PyQt5 import uic
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMainWindow, QLabel, QComboBox, QLineEdit, QMessageBox
+from PyQt5.QtWidgets import QMainWindow, QLabel, QComboBox, QLineEdit, QMessageBox, QVBoxLayout
 
 from constants import MAP_LAYERS, MAP_IMG_SIZE_V
 from converter import lonlat_to_xy, xy_to_lonlat, lonlat_to_spn
@@ -18,6 +18,7 @@ class Window(QMainWindow):
     map_label: QLabel
     layer_input: QComboBox
     address_input: QLineEdit
+    options_layout: QVBoxLayout
 
     def __init__(self):
         super().__init__()
@@ -25,6 +26,7 @@ class Window(QMainWindow):
         self.init()
 
     def init(self):
+        self.options_layout.setAlignment(Qt.AlignTop)
         self.layer_input.currentIndexChanged.connect(self.layer_changed)
         self.map_type = MAP_LAYERS[self.layer_input.currentIndex()]
 
