@@ -2,11 +2,11 @@ import os
 
 from PyQt5 import uic
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMainWindow, QLabel, QComboBox, QLineEdit, QMessageBox, QVBoxLayout
+from PyQt5.QtWidgets import QMainWindow, QLabel, QComboBox, QLineEdit, QMessageBox, QVBoxLayout, QTextEdit
 
 from constants import MAP_LAYERS, MAP_IMG_SIZE_V
 from converter import lonlat_to_xy, xy_to_lonlat, lonlat_to_spn
-from geocoder import get_toponym, get_toponym_lonlat, get_toponym_spn
+from geocoder import get_toponym, get_toponym_lonlat, get_toponym_spn, get_address
 from static_maps import show_map, MAP_TMP_FILENAME
 from vec import Vec
 
@@ -19,7 +19,9 @@ class Window(QMainWindow):
     layer_input: QComboBox
     address_input: QLineEdit
     options_layout: QVBoxLayout
+    full_address: QTextEdit
     dot = None
+    toponym = None
 
     def __init__(self):
         super().__init__()
@@ -34,6 +36,7 @@ class Window(QMainWindow):
         self.find_button.clicked.connect(self.find_obj)
         self.delete_button.clicked.connect(self.delete_search_results)
 
+        self.toponym = None
         self.dot = None
         self.zoom = 9
         self.lonlat = Vec(37.530887, 55.703118)
@@ -45,6 +48,9 @@ class Window(QMainWindow):
 
     def update_map(self):
         show_map(self.map_label, self.zoom, self.lonlat, self.map_type, self.dot)
+        if self.toponym:
+            address = get_address(self.toponym)
+            self.full_address.setText(address)
 
     def closeEvent(self, event):
         os.remove(MAP_TMP_FILENAME)
@@ -101,6 +107,8 @@ class Window(QMainWindow):
 
     def delete_search_results(self):
         self.dot = None
+        self.toponym = None
+        self.full_address.setText('')
         self.update_map()
 
     def search_toponym(self, search_text):
@@ -116,7 +124,7 @@ class Window(QMainWindow):
         toponym = self.search_toponym(self.address_input.text())
         if toponym is None:
             return
-
+        self.toponym = toponym
         coords = get_toponym_lonlat(toponym)
         obj_size = get_toponym_spn(toponym)
         self.lonlat = self.dot = coords
