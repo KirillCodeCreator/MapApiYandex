@@ -1,5 +1,8 @@
 from math import sin, log, pi, tan
 
+from constants import MAP_IMG_SIZE_V
+from vec import Vec
+
 e = 0.0818191908426
 Z = 32
 
@@ -40,3 +43,16 @@ def xy_to_lonlat(z, x, y):
     lat = br
 
     return long, lat
+
+
+def lonlat_to_spn(z, long, lat):
+    x, y = lonlat_to_xy(z, long, lat)
+    return Vec(*xy_to_lonlat(
+        z,
+        x + MAP_IMG_SIZE_V.x / 2,
+        y - MAP_IMG_SIZE_V.y / 2
+    )) - Vec(*xy_to_lonlat(
+        z,
+        x - MAP_IMG_SIZE_V.x / 2,
+        y + MAP_IMG_SIZE_V.y / 2
+    ))
