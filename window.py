@@ -32,6 +32,7 @@ class Window(QMainWindow):
         self.map_type = MAP_LAYERS[self.layer_input.currentIndex()]
 
         self.find_button.clicked.connect(self.find_obj)
+        self.delete_button.clicked.connect(self.delete_search_results)
 
         self.dot = None
         self.zoom = 9
