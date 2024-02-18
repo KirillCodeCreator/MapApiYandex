@@ -102,6 +102,34 @@ class Window(QMainWindow):
 
         self.update_map()
 
+    def mousePressEvent(self, event):
+        old_lonlat = self.lonlat
+
+        x, y = event.x() - 5, event.y() - 5
+        y -= (self.size().height() - MAP_IMG_SIZE_V.y - 10) / 2
+
+        if not (0 <= x <= MAP_IMG_SIZE_V.x and 0 <= y <= MAP_IMG_SIZE_V.y):
+            return
+
+        x -= MAP_IMG_SIZE_V.x / 2
+        y -= MAP_IMG_SIZE_V.y / 2
+
+        cx, cy = lonlat_to_xy(self.zoom, *self.lonlat.xy)
+        px, py = cx + x, cy + y
+        dot = Vec(*xy_to_lonlat(self.zoom, px, py))
+        self.lonlat = dot
+
+        if not self.check_borders():
+            self.lonlat = old_lonlat
+            return
+        self.lonlat = old_lonlat
+
+        if event.button() == Qt.LeftButton:
+            if not self.search_toponym(dot.to_ym()):
+                return
+            self.dot = dot
+            self.update_map()
+
     def check_borders(self):
         return not (
                 abs(abs(self.lonlat.x) - 180) < 0.5 or
@@ -126,21 +154,21 @@ class Window(QMainWindow):
         self.update_map()
 
     def search_toponym(self, search_text):
+        self.delete_search_results()
         try:
-            return get_toponym(search_text)
+            self.toponym = get_toponym(search_text)
+            return True
         except IndexError:
             QMessageBox.critical(
                 self, 'Ошибка', 'Объект по данному запросу не найден')
-            return None
+            return False
 
     def find_obj(self):
-        self.delete_search_results()
-        toponym = self.search_toponym(self.address_input.text())
-        if toponym is None:
+        if not self.search_toponym(self.address_input.text()):
             return
-        self.toponym = toponym
-        coords = get_toponym_lonlat(toponym)
-        obj_size = get_toponym_spn(toponym)
+
+        coords = get_toponym_lonlat(self.toponym)
+        obj_size = get_toponym_spn(self.toponym)
         self.lonlat = self.dot = coords
 
         while self.compare_spn(obj_size, 1):
